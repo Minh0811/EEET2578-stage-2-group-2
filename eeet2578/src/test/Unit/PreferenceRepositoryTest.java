@@ -248,8 +248,146 @@ class PreferenceRepositoryTest {
     }
 
     
+ 
     
+    
+    
+    
+    //getPreference(PreferenceRequest request, Current current)
+    //Positive-test(Correct reference of APO): the method should return correct reference 
+    @Test
+    void getPreference_CorrectPreferenceForAPO_PositiveTest() {
+        request = new PreferenceRequest();
+        request.username = "Jack";
+        request.weather = 0;
+        request.value ="APO";
+        assertEquals("bowling",worker.getPreference(request, current));
+    }
+
+    //Negative-test(Incorrect reference of APO): the method should not return correct reference
+    @Test
+    void getPreference_WrongPreferenceForAPO_NeagtiveTest() {
+        request = new PreferenceRequest();
+        request.username = "Jack";
+        request.weather = 0;
+        request.value ="APO";
+        assertNotEquals("shops",worker.getPreference(request, current));
+    }
+
+    //Positive-test(Correct reference of Temperature): the method should return correct reference 
+    @Test
+    void getPreference_CorrectPreferenceForTemperature_PositiveTest() {
+        request = new PreferenceRequest();
+        request.username = "Jack";
+        request.weather = 0;
+        request.value = "20";
+        assertEquals("shops",worker.getPreference(request, current));
+    }
+
+    //Negative-test(Incorrect reference of temperature): the method should not return correct reference
+    @Test
+    void getPreference_WrongPreferenceForTemperature_NegativeTest() {
+        request = new PreferenceRequest();
+        request.username = "Jack";
+        request.weather = 0;
+        request.value = "20";
+        assertNotEquals("cinema",worker.getPreference(request, current));
+    }
+
+    //Positive-test(Correct reference of weather): the method should return correct reference 
+    @Test
+    void getPreference_CorrectPreferenceForWeather_PositiveTest() {
+        request = new PreferenceRequest();
+        request.username = "Jack";
+        request.weather = 1;
+        request.value = "";
+        assertEquals("cinema",worker.getPreference(request, current));
+    }
+
+    //Negative-test(Incorrect reference of weather): the method should not return correct reference
+    @Test
+    void getPreference_WrongPreferenceForWeather_NegativeTest() {
+        request = new PreferenceRequest();
+        request.username = "Jack";
+        request.weather = 1;
+        request.value = "";
+        assertNotEquals("bowling",worker.getPreference(request, current));
+    }
+
+    //Positive-test(Correct reference of Context Manager): the method should return correct reference 
+    @Test
+    void getPreference_CorrectRequest_PositiveTest() {
+        request = new PreferenceRequest();
+        request.username = "Jack";
+        request.weather = 0;
+        request.value = "APO";
+        bool = false;
+        if (((worker.getUserInfo(request.username, current).weather) == request.weather && ((request.value == "" || request.value == "APO" || Arrays.toString(worker.getUserInfo(request.username,current).tempThreshholds).contains(request.value))))) {
+            bool = true;
+        }
+        assertTrue(bool);
+    }
+
+    //Negative-test(Incorrect reference of Context Manager, Invalid AOP value): the method should not return correct reference
+  //1
+    @Test
+    void getPreference_WrongRequest_NegativeTest1() {
+        request = new PreferenceRequest();
+        request.username = "David";
+        request.weather = 0;
+        request.value = "abc";
+        bool = false;
+        if (((worker.getUserInfo(request.username, current).weather) == request.weather && ((request.value == "" || request.value == "APO" || Arrays.toString(worker.getUserInfo(request.username,current).tempThreshholds).contains(request.value))))) {
+            bool = true;
+        }
+        assertFalse(bool);
+    }
+
+    //Negative-test(Incorrect reference of Context Manager, Invalid space AOP value): the method should not return correct reference
+    @Test
+    void getPreference_WrongRequest_NegativeTest2() {
+        request = new PreferenceRequest();
+        request.username = "David";
+        request.weather = 0;
+        request.value = " ";
+        bool = false;
+        if (((worker.getUserInfo(request.username, current).weather) == request.weather && ((request.value == "" || request.value == "APO" || Arrays.toString(worker.getUserInfo(request.username,current).tempThreshholds).contains(request.value))))) {
+            bool = true;
+        }
+        assertFalse(bool);
+    }
+
+    //Negative-test(Incorrect reference of Context Manager, Invalid weather value): the method should not return correct reference
+    @Test
+    void getPreference_WrongRequest_NegativeTest4() {
+        request = new PreferenceRequest();
+        request.username = "David";
+        request.weather = 4;
+        request.value = "*";
+        bool = false;
+        if (((worker.getUserInfo(request.username, current).weather) == request.weather && ((request.value == "" || request.value == "APO" || Arrays.toString(worker.getUserInfo(request.username,current).tempThreshholds).contains(request.value))))) {
+            bool = true;
+        }
+        assertFalse(bool);
+    }
+
+    //Negative-test(Incorrect reference of Context Manager, Invalid temperature value): the method should not return correct reference
+  //1
+    @Test
+    void getPreference_WrongRequest_NegativeTest5() {
+        request = new PreferenceRequest();
+        request.username = "Jack";
+        request.weather = 0;
+        request.value = "35";
+        bool = false;
+        if (((worker.getUserInfo(request.username, current).weather) == request.weather && ((request.value == "" || request.value == "APO" || Arrays.toString(worker.getUserInfo(request.username,current).tempThreshholds).contains(request.value))))) {
+            bool = true;
+        }
+        assertFalse(bool);
+    }
 }
+    
+
     
     
     
