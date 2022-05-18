@@ -37,7 +37,7 @@ public class EnviroAPPUI {
 	private static final String WEATHER = "Weather";
 	private static final String NEWLINE = "\n";
 
-	private static class AlerterI implements Alerter {
+	public static class AlerterI implements Alerter {
 
 		@Override
 		public void alert(Alert alert, Current current) {
