@@ -7,7 +7,7 @@ import helper.*;
 import support.Sensor;
 
 public class AllSensors {
-	private String username;
+	public String username;
 	private boolean signal;
 	private Sensor locationSensor;
 	private Sensor temperatureSensor;

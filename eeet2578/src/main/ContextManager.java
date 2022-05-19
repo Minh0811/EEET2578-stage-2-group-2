@@ -22,15 +22,15 @@ import helper.*;
 import support.LocationDetails;
 
 public class ContextManager {
-	private static List<LocationDetails> cityInfo;
+	public static List<LocationDetails> cityInfo;
 	private static Integer currentWeather;
-	private static LocationWorkerPrx locationWorker;
+	public static LocationWorkerPrx locationWorker;
 	private static PreferenceWorkerPrx preferenceWorker;
 	private static WeatherAlarmWorkerPrx weatherAlarmWorker;
 	private static Communicator communicator;
 	private static LinkedHashMap<String, TopicPrx> subcribers = new LinkedHashMap<>();
 	private static LinkedHashMap<String, ObjectPrx> proxies = new LinkedHashMap<>();
-	private static LinkedHashMap<String, User> users = new LinkedHashMap<>();
+	public static LinkedHashMap<String, User> users = new LinkedHashMap<>();
 	private static LinkedHashMap<String, AlerterPrx> alerters = new LinkedHashMap<>();
 	private static final String INDOOR = "Indoor";
 	private static final String OUTDOOR = "Outdoor";
@@ -272,7 +272,7 @@ public class ContextManager {
 		}
 	}
 	
-	private static List<LocationDetails> readCityInfo() {
+	public static List<LocationDetails> readCityInfo() {
 		List<LocationDetails> result = new ArrayList<>();
 		File file = new File("CityInfo");
 		int count = 0;
@@ -296,7 +296,7 @@ public class ContextManager {
 		return result;
 	}
 
-	private static List<String> getLocationsByService(String service) {
+	public static List<String> getLocationsByService(String service) {
 		List<String> result = new ArrayList<>();
 		for (LocationDetails locationDetails : cityInfo) {
 			if (locationDetails.getServices().contains(service)) {
@@ -309,25 +309,25 @@ public class ContextManager {
 		return result;
 	}
 
-	private static void resetClock(String username) {
+	public static void resetClock(String username) {
 		users.get(username).clock = 0;
 	}
 
-	private static void tickClock(String username) {
+	public static void tickClock(String username) {
 		users.get(username).clock += 1;
 	}
 
-	private static boolean checkapoReached(User user) {
+	public static boolean checkapoReached(User user) {
 		return user.clock == user.apoThreshhold;
 	}
 
-	private static boolean checkTempReached(User user) {
+	public static boolean checkTempReached(User user) {
 		int temperature = user.sensorData.temperature;
 		List<Integer> tempThreshholds = Arrays.stream(user.tempThreshholds).boxed().collect(Collectors.toList());
 		return temperature >= Collections.min(tempThreshholds);
 	}
 
-	private static Integer calculateapoThreshhold(User user) {
+	public static Integer calculateapoThreshhold(User user) {
 		Integer medicalConditionType = user.medicalConditionType;
 		Integer aqi = user.sensorData.aqi;
 		Integer result = null;
