@@ -137,7 +137,7 @@ public class PreferenceRepository {
 			}
 		}
 		return result;
-	}
+	} 
 
 	public static String getSuggestionAPO(String name) {
 		String result = null;

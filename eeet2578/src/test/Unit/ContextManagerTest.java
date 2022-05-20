@@ -5,6 +5,8 @@ import helper.PreferenceWorkerPrx;
 import helper.User;
 import helper.ContextManagerWorker;
 import main.ContextManager;
+
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.BeforeClass;
 import org.junit.jupiter.api.DisplayName;
@@ -16,6 +18,7 @@ import com.zeroc.Ice.Current;
 
 import support.LocationDetails;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -31,32 +34,24 @@ private List<LocationDetails> list;
 	
 @BeforeClass
 public static void setUpClass() {
+    ContextManager.communicator = com.zeroc.Ice.Util.initialize();
+    ContextManager.cityInfo = ContextManager.readCityInfo();
+    ContextManager.iniPreferenceWorker();
+    ContextManager.iniLocationMapper();
+    ContextManager.iniWeatherAlarmWorker();
+    ContextManager.runWeatherAlarm();
+    ContextManager.setupContextManagerWorker();
 
 }
 @BeforeEach
 void setUp() {
 	WorkerI = new ContextManager.ContextManagerWorkerI();
-	list = ContextManager.readCityInfo();
     //SetupTest.setupService();
 	}
 
-@ParameterizedTest
-@ValueSource(strings = {"Jack,1"})
-@DisplayName("addUser Test")
-void addUserTest(String data) {
-	String user = data.split(",")[0];
-	int medicalCondition = Integer.parseInt(data.split(",")[1]);
-	WorkerI.addUser(user, null);
-	System.out.print(user);
-	if (!user.equals("Jack") && !user.equals("David")) {
-		assertEquals(0, ContextManager.users.size());
-		} 
-	else {
-		assertEquals(1, ContextManager.users.size());
-		System.out.println(medicalCondition);
-		System.out.println(ContextManager.users.get(user).medicalConditionType);
-		assertEquals(medicalCondition, ContextManager.users.get(user).medicalConditionType);
-		}
+@AfterEach 
+void afterEach() {
+	ContextManager.communicator.shutdown();
 }
 
 @ParameterizedTest
@@ -104,15 +99,17 @@ ContextManager.cityInfo = ContextManager.readCityInfo();
 
 //resetClock(String username)
 @ParameterizedTest
-@ValueSource(strings = {"Jack-50"})
+@ValueSource(strings = {"Jack,50"})
 @DisplayName("resetClock Test cases")
 void resetClockTest(String data) {
-String name = data.split("-")[0];
-int currentClock = Integer.parseInt(data.split("-")[1]);
+String name = data.split(",")[0];
+System.out.println(name);
+int currentClock = Integer.parseInt(data.split(",")[1]);
 ContextManager.users.get(name).clock = currentClock;
+int resetCurrentClock = ContextManager.users.get(name).clock;
 int newClock = ContextManager.users.get(name).clock;
 ContextManager.resetClock(name);
-assertEquals(0, newClock);
+assertEquals(0, resetCurrentClock);
 	}
 
 //tickClock(String username)
@@ -120,13 +117,13 @@ assertEquals(0, newClock);
 
 //checkAPOReached(User user)
 @ParameterizedTest
-@ValueSource(strings = {"1-30-30", "1-30-2"})
+@ValueSource(strings = {"1,30,30", "1,30,2"})
 @DisplayName("checkAPOReached Test")
 void checkAPOReachedTest(String data) {
 	User user = new User();
-	int medicalCondition = Integer.parseInt(data.split("-")[0]);
-	int AQI = Integer.parseInt(data.split("-")[1]);
-	int clock = Integer.parseInt(data.split("-")[2]);
+	int medicalCondition = Integer.parseInt(data.split(",")[0]);
+	int AQI = Integer.parseInt(data.split(",")[1]);
+	int clock = Integer.parseInt(data.split(",")[2]);
 	int baseTime;
 	if(AQI > 0 && AQI <= 50) {
 		baseTime = 30;
@@ -204,11 +201,89 @@ void calculateAPOThreshold(String data) {
 	assertEquals(expected, ContextManager.calculateapoThreshhold(user));
 }
 //addUser(String username, Current current)
-//searchInfo(String item, Current current)
-//searchItems(String username, Current current)
+@ParameterizedTest
+@ValueSource(strings = {" Jack,2", "David,3",})
+@DisplayName("addUser Test")
+void addUserTest(String data) {
+	String user  = data.split(",")[0];
+	String medicalType = data.split(",")[1];
+	int getMedicalType = ContextManager.users.get(user).medicalConditionType;
+	WorkerI.addUser(user, new Current());
+	assertEquals(medicalType, getMedicalType);
+} 
+
+
 //deleteUser(String username, Current current)
+@ParameterizedTest
+@ValueSource(strings = {" Jack", "David"})
+@DisplayName("deleteUser Test")
+void deleteUserTest(String data) {
+	String user  = data.split(",")[0];
+	boolean addUser = WorkerI.addUser(user, new Current());
+    int initialsSize;
+    boolean deleteUser = WorkerI.deleteUser(user, new Current());
+    if(user.equals("Jack") || user.equals("David")) {
+    	 WorkerI.addUser(user, new Current());
+    	 initialsSize = ContextManager.users.size();
+    	 WorkerI.deleteUser(user, new Current());
+    	 assertEquals(initialsSize - 1, ContextManager.users.size());
+    }
+    else {
+    	ContextManager.users.put(user, new User());
+    	initialsSize = ContextManager.users.size();
+    	assertEquals(initialsSize, ContextManager.users.size());
+    }
+}
 
 
+//searchInfo(String item, Current current) 
+@ParameterizedTest
+@ValueSource(strings = {"Jack,A", "Jack,B", "Jack,C", "Jack,D"})
+@DisplayName("searchItems Test")
+
+void searchInfoTest(String data) {
+	String info  = data.split(",")[0];
+	String expected = data.split(",")[1];
+	String location = data.split(",")[1];
+String actual = WorkerI.addUser(info, new Current());
+ContextManager.cityInfo = ContextManager.readCityInfo();
+if(actual == null) {
+	actual = "null";
+	}
+assertEquals(expected, actual);
+	}
+
+
+
+
+//searchItems(String username, Current current)
+@ParameterizedTest
+@ValueSource(strings = {"Jack,A", "Jack,B", "Jack,C", "Jack,D"})
+@DisplayName("searchItems Test")
+
+void searchItemsTest(String data) {
+	String user  = data.split(",")[0];
+	String location = data.split(",")[1];
+	WorkerI.addUser(user, new Current());
+	ContextManager.users.get(user).sensorData.location = location;
+	String locations = Array.toString(WorkerI.searchItems(user, new Current()));
+    String expected = "";
+    switch (data.split((","))[1]){
+    case "A":
+    	expected = "";
+    	break;
+    case "B":
+    	expected = "";
+    	break;
+    case "C":
+    	expected = "";
+    	break;
+    case "D":
+    	expected = "";
+    	break;
+    	}
+assertEquals(expected, locations);
+	}
 }
 
 

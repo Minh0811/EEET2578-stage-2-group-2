@@ -42,7 +42,7 @@ public class LocationServer {
 		adapter.activate();
 	}
 
-	private static LinkedHashMap<String, String> readConfig() {
+	public static LinkedHashMap<String, String> readConfig() {
 		File file = new File("LocationServerConfig");
 		LinkedHashMap<String, String> result = new LinkedHashMap<>();
 		try {

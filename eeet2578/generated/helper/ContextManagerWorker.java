@@ -17,9 +17,9 @@ package helper;
 
 public interface ContextManagerWorker extends com.zeroc.Ice.Object
 {
-    void addUser(String username, com.zeroc.Ice.Current current);
+    String addUser(String username, com.zeroc.Ice.Current current);
 
-    void deleteUser(String username, com.zeroc.Ice.Current current);
+    boolean deleteUser(String username, com.zeroc.Ice.Current current);
 
     String searchInfo(String item, com.zeroc.Ice.Current current);
 

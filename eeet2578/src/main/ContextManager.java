@@ -27,7 +27,7 @@ public class ContextManager {
 	public static LocationWorkerPrx locationWorker;
 	private static PreferenceWorkerPrx preferenceWorker;
 	private static WeatherAlarmWorkerPrx weatherAlarmWorker;
-	private static Communicator communicator;
+	public static Communicator communicator;
 	private static LinkedHashMap<String, TopicPrx> subcribers = new LinkedHashMap<>();
 	private static LinkedHashMap<String, ObjectPrx> proxies = new LinkedHashMap<>();
 	public static LinkedHashMap<String, User> users = new LinkedHashMap<>();
@@ -103,13 +103,14 @@ public class ContextManager {
 	public static class ContextManagerWorkerI implements ContextManagerWorker {
 
 		@Override
-		public void addUser(String username, Current current) {
+		public boolean addUser(String username, Current current) {
 			User user = preferenceWorker.getUserInfo(username);
 			users.put(username, user);
 			setupAlerter(username);
 			setupSubcriber(username);
 			System.out.println(username + " added!");
 			checkWeather(currentWeather);
+			return false;
 		}
 
 		@Override
@@ -218,29 +219,29 @@ public class ContextManager {
 		}
 	}
 
-	private static void setupContextManagerWorker() {
+	public static void setupContextManagerWorker() {
 		com.zeroc.Ice.ObjectAdapter adapter = communicator.createObjectAdapterWithEndpoints("ContextManagerWorker",
 				"default -p 13333");
 		adapter.add(new ContextManagerWorkerI(), com.zeroc.Ice.Util.stringToIdentity("ContextManagerWorker"));
 		adapter.activate();
 	}
 
-	private static void iniPreferenceWorker() {
+	public static void iniPreferenceWorker() {
 		com.zeroc.Ice.ObjectPrx base = communicator.stringToProxy("PreferenceWorker:default -p 14444");
 		preferenceWorker = PreferenceWorkerPrx.checkedCast(base);
 	}
 
-	private static void iniLocationMapper() {
+	public static void iniLocationMapper() {
 		com.zeroc.Ice.ObjectPrx base = communicator.stringToProxy("LocationWorker:default -p 11111");
 		locationWorker = LocationWorkerPrx.checkedCast(base);
 	}
 	
-	private static void iniWeatherAlarmWorker() {
+	public static void iniWeatherAlarmWorker() {
 		com.zeroc.Ice.ObjectPrx base = communicator.stringToProxy("WeatherAlarmWorker:default -p 15555");
 		weatherAlarmWorker = WeatherAlarmWorkerPrx.checkedCast(base);
 	}
 	
-	private static void runWeatherAlarm() {
+	public static void runWeatherAlarm() {
 		Thread thread = new Thread() {
 			@Override
 			public void run() {
@@ -303,7 +304,7 @@ public class ContextManager {
 				String locationStatus = locationWorker.locationMapping(locationDetails.getLocation());
 				if (locationStatus.equals(INDOOR)) {
 					result.add(locationDetails.getName());
-				}
+				} 
 			}
 		}
 		return result;

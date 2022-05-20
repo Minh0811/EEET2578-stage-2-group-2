@@ -8,12 +8,12 @@ import support.Sensor;
 
 public class AllSensors {
 	public String username;
-	private boolean signal;
-	private Sensor locationSensor;
-	private Sensor temperatureSensor;
-	private Sensor aqiSensor;
-	private Communicator communicator;
-	private MonitorPrx monitor;
+	public boolean signal;
+	public Sensor locationSensor;
+	public Sensor temperatureSensor;
+	public Sensor aqiSensor;
+	public Communicator communicator;
+	public MonitorPrx monitor;
 	
 
 	public AllSensors(String username) {
@@ -71,7 +71,7 @@ public class AllSensors {
 		monitor = MonitorPrx.uncheckedCast(pub);
 	}
 
-	private SensorData getSensorData() {
+	public SensorData getSensorData() {
 		String location = this.locationSensor.getCurrentValue();
 		int temperature = Integer.parseInt(this.temperatureSensor.getCurrentValue());
 		int uvr = Integer.parseInt(this.aqiSensor.getCurrentValue());
